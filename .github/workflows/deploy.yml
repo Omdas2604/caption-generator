@@ -15,9 +15,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
     steps:
       - name: Checkout your repository
         uses: actions/checkout@v4
+
+        # Add this new step for debugging
+      - name: List files in the repository
+        run: ls -R
       
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -33,7 +40,7 @@ jobs:
       - name: Upload production-ready build files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./frontend/dist
 
   deploy:
     needs: build
