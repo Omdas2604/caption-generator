@@ -1,46 +1,46 @@
 import React, { useState, useRef, useEffect, createContext, useContext } from 'react';
 import axios from 'axios';
+// Make sure to import HashRouter if you are using it instead of BrowserRouter
 import { BrowserRouter, Routes, Route, Link, useNavigate, Outlet, Navigate } from 'react-router-dom';
 
 // ------------------- 1. API CLIENT (Corrected) -------------------
-// Configured to talk to your backend on the correct port (3000)
+// This will now use your environment variables.
+// In development, it uses http://localhost:3000/api
+// In production (GitHub Pages), it will use the URL from your .env.production file
 const apiClient = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api', // Fallback for safety
     withCredentials: true,
 });
 
-// ------------------- 2. AUTHENTICATION CONTEXT (Corrected) -------------------
-// Manages the user's login state throughout the app
+// ------------------- 2. AUTHENTICATION CONTEXT (No Changes Needed Here) -------------------
 const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // To check for an existing session on app load
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Uses the '/auth/me' route you added to check if the user is already logged in
         apiClient.get('/auth/me')
             .then(response => {
-                // Correctly gets user data from response.data.data
                 setUser(response.data.data);
             })
-            .catch(() => setUser(null)) // If no session, user is null
+            .catch(() => {
+                // This is expected for logged-out users. It correctly sets the user to null.
+                setUser(null);
+            })
             .finally(() => setIsLoading(false));
     }, []);
 
     const login = async (username, password) => {
-        // Sends 'username' (not email) and expects user data at response.data.user
         const response = await apiClient.post('/auth/login', { username, password });
         setUser(response.data.user);
     };
 
     const register = async (username, password) => {
-        // Sends only the 'username' and 'password' fields your backend expects
         await apiClient.post('/auth/register', { username, password });
     };
 
     const logout = async () => {
-        // Uses the '/auth/logout' route you added
         await apiClient.post('/auth/logout');
         setUser(null);
     };
@@ -49,10 +49,10 @@ const AuthProvider = ({ children }) => {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// A custom hook to easily use the auth context anywhere in the app
 const useAuth = () => useContext(AuthContext);
 
-// ------------------- 3. PAGE & UI COMPONENTS (Corrected) -------------------
+
+// ------------------- 3. PAGE & UI COMPONENTS (No Changes Needed Here) -------------------
 
 // --- Main Layout with Navbar ---
 const Layout = () => {
@@ -87,14 +87,13 @@ const Layout = () => {
                 </div>
             </nav>
             <main>
-                <Outlet /> {/* Renders the current page (Home, Login, or Register) */}
+                <Outlet />
             </main>
         </div>
     );
 };
 
 // --- Protected Route Component ---
-// If the user isn't logged in, they are redirected to the login page.
 const ProtectedRoute = ({ children }) => {
     const { user, isLoading } = useAuth();
     if (isLoading) {
@@ -116,7 +115,7 @@ const LoginPage = () => {
         setError('');
         try {
             await login(username, password);
-            navigate('/'); // Redirect to home page on successful login
+            navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to log in. Please check your credentials.');
         }
@@ -199,12 +198,10 @@ const HomePage = () => {
         setIsLoading(true);
         setError('');
         const formData = new FormData();
-        // Correctly uses 'image' as the field name to match your backend multer config
         formData.append('image', selectedFile);
 
         try {
             const response = await apiClient.post('/posts', formData);
-            // Correctly finds the caption in response.data.post.caption
             setCaption(response.data.post.caption);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to generate caption.');
@@ -235,14 +232,15 @@ const HomePage = () => {
 };
 
 // ------------------- 4. MAIN APP ROUTER -------------------
-// This ties everything together.
 export default function App() {
     return (
         <AuthProvider>
-            <BrowserRouter>
+            {/* FIX: Add the basename prop to tell the router about the subdirectory.
+              This will solve the "No routes matched location" error.
+            */}
+            <BrowserRouter basename="/caption-generator/">
                 <Routes>
                     <Route element={<Layout />}>
-                        {/* The HomePage is now protected */}
                         <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
@@ -252,4 +250,3 @@ export default function App() {
         </AuthProvider>
     );
 }
-
