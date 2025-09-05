@@ -1,18 +1,12 @@
 import React, { useState, useRef, useEffect, createContext, useContext } from 'react';
 import axios from 'axios';
-// Make sure to import HashRouter if you are using it instead of BrowserRouter
 import { BrowserRouter, Routes, Route, Link, useNavigate, Outlet, Navigate } from 'react-router-dom';
 
-// ------------------- 1. API CLIENT (Corrected) -------------------
-// This will now use your environment variables.
-// In development, it uses http://localhost:3000/api
-// In production (GitHub Pages), it will use the URL from your .env.production file
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api', // Fallback for safety
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api', 
     withCredentials: true,
 });
 
-// ------------------- 2. AUTHENTICATION CONTEXT (No Changes Needed Here) -------------------
 const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
@@ -25,7 +19,6 @@ const AuthProvider = ({ children }) => {
                 setUser(response.data.data);
             })
             .catch(() => {
-                // This is expected for logged-out users. It correctly sets the user to null.
                 setUser(null);
             })
             .finally(() => setIsLoading(false));
@@ -52,9 +45,6 @@ const AuthProvider = ({ children }) => {
 const useAuth = () => useContext(AuthContext);
 
 
-// 3. PAGE & UI COMPONENTS 
-
-// --- Main Layout with Navbar ---
 const Layout = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -102,7 +92,6 @@ const ProtectedRoute = ({ children }) => {
     return user ? children : <Navigate to="/login" replace />;
 };
 
-// --- Login Page ---
 const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -136,7 +125,6 @@ const LoginPage = () => {
     );
 };
 
-// --- Register Page ---
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -174,7 +162,6 @@ const RegisterPage = () => {
     );
 };
 
-// --- Home Page (The Image Uploader) ---
 const HomePage = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState('');
@@ -231,7 +218,6 @@ const HomePage = () => {
     );
 };
 
-// ------------------- 4. MAIN APP ROUTER -------------------
 export default function App() {
     return (
         <AuthProvider>
