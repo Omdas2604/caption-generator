@@ -134,8 +134,12 @@ Visit [http://localhost:3000](http://localhost:3000) to use Caption Generator.
 
 1. **Register** a new account or **log in**.
    <img width="1919" height="915" alt="image" src="https://github.com/user-attachments/assets/55a45bd2-ea0a-468c-b8f3-3afc1af88a8e" />
-3. **Upload** a photo.
+2. **Upload** a photo.
+3. <img width="1919" height="905" alt="image" src="https://github.com/user-attachments/assets/4cf0f936-d743-44d0-b03d-fec434cd3659" />
+   <img width="1919" height="912" alt="image" src="https://github.com/user-attachments/assets/ea4aabce-e2a5-4a7b-9fca-b5a11c0f6c2f" />
 4. **Generate** a caption and **copy** it for your use!
+    <img width="1919" height="906" alt="image" src="https://github.com/user-attachments/assets/d2e8511e-d4a9-4ec5-b3b0-04d506be0594" />
+
 
 ---
 
