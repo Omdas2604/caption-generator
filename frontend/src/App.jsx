@@ -52,7 +52,7 @@ const AuthProvider = ({ children }) => {
 const useAuth = () => useContext(AuthContext);
 
 
-// ------------------- 3. PAGE & UI COMPONENTS (No Changes Needed Here) -------------------
+// 3. PAGE & UI COMPONENTS 
 
 // --- Main Layout with Navbar ---
 const Layout = () => {
@@ -235,9 +235,6 @@ const HomePage = () => {
 export default function App() {
     return (
         <AuthProvider>
-            {/* FIX: Add the basename prop to tell the router about the subdirectory.
-              This will solve the "No routes matched location" error.
-            */}
             <BrowserRouter basename="/caption-generator/">
                 <Routes>
                     <Route element={<Layout />}>
